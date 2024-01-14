@@ -3,7 +3,7 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 
 // TODO(#1): Create database module
-// TODO: Implement authentication/authorization
+// TODO(#2): Implement authentication/authorization
 // TODO: Test and validate the complete REST API
 
 async function bootstrap() {
