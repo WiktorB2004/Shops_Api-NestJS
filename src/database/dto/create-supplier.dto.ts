@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumberString, IsString, MaxLength } from "class-validator";
+import { IsEmail, IsNotEmpty, IsPhoneNumber, IsString, MaxLength } from "class-validator";
 
 export class CreateSupplierDto {
     @IsString()
@@ -9,14 +9,15 @@ export class CreateSupplierDto {
     @IsString()
     @MaxLength(15)
     @IsNotEmpty()
+    @IsPhoneNumber()
     readonly phoneNumber: string;
 
     @IsString()
     @IsNotEmpty()
+    @IsEmail()
     readonly email: string;
 
     products: string[];
 
-    @IsNumberString()
     productCount: number;
 }

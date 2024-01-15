@@ -3,6 +3,8 @@ import { CreateProductDto } from '../dto/create-product.dto';
 import { UpdateProductDto } from '../dto/update-product.dto';
 import { ProductService } from './products.service';
 import { SupplierService } from '../suppliers/suppliers.service';
+import { Supplier } from '../schemas/supplier.schema';
+import { Product } from '../schemas/product.schema';
 
 
 @Controller('product')
@@ -63,6 +65,20 @@ export class ProductController {
                 this.productService.getProduct(productId);
             return response.status(HttpStatus.OK).json({
                 message: 'Product found successfully', existingProduct,
+            });
+        } catch (err) {
+            return response.status(err.status).json(err.response);
+        }
+    }
+
+    @Get('/:id/supplier')
+    async getProductSupplier(@Res() response, @Param('id') productId: string) {
+        try {
+            const existingProduct: Product = await this.productService.getProduct(productId);
+            const supplierData: Supplier = await this.supplierService.getSupplier(existingProduct.supplierId);
+            return response.status(HttpStatus.OK).json({
+                message: 'Product found successfully', existingProduct,
+                info: `Product: ${existingProduct.productName} supplier data`, supplierData
             });
         } catch (err) {
             return response.status(err.status).json(err.response);

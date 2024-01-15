@@ -3,6 +3,7 @@ import { CreateSupplierDto } from '../dto/create-supplier.dto';
 import { UpdateSupplierDto } from '../dto/update-supplier.dto';
 import { SupplierService } from './suppliers.service';
 import { ProductService } from '../products/products.service';
+import { Product } from '../schemas/product.schema';
 
 
 @Controller('supplier')
@@ -55,10 +56,23 @@ export class SupplierController {
     @Get('/:id')
     async getSupplier(@Res() response, @Param('id') supplierId: string) {
         try {
-            const existingSupplier = await
-                this.supplierService.getSupplier(supplierId);
+            const existingSupplier = await this.supplierService.getSupplier(supplierId);
             return response.status(HttpStatus.OK).json({
                 message: 'Supplier found successfully', existingSupplier,
+            });
+        } catch (err) {
+            return response.status(err.status).json(err.response);
+        }
+    }
+
+    @Get('/:id/full')
+    async getSupplierProducts(@Res() response, @Param('id') supplierId: string) {
+        try {
+            const existingSupplier = await this.supplierService.getSupplier(supplierId);
+            let productsList: Product[] = await Promise.all(existingSupplier.products.map(async (x) => await this.productService.getProduct(x)));
+            return response.status(HttpStatus.OK).json({
+                message: 'Supplier found successfully', existingSupplier,
+                info: `Supplier: ${existingSupplier.supplierName} found products list`, productsList
             });
         } catch (err) {
             return response.status(err.status).json(err.response);
