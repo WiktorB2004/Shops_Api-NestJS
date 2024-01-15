@@ -15,8 +15,8 @@ export class CreateSupplierDto {
     @IsNotEmpty()
     readonly email: string;
 
-    readonly products: string[];
+    products: string[];
 
     @IsNumberString()
-    readonly productCount: number;
+    productCount: number;
 }

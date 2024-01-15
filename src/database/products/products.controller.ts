@@ -2,16 +2,21 @@ import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, Res } from
 import { CreateProductDto } from '../dto/create-product.dto';
 import { UpdateProductDto } from '../dto/update-product.dto';
 import { ProductService } from './products.service';
+import { SupplierService } from '../suppliers/suppliers.service';
 
 
 @Controller('product')
 export class ProductController {
-    constructor(private readonly productService: ProductService) { }
+    constructor(private readonly productService: ProductService, private readonly supplierService: SupplierService) { }
 
     @Post()
     async createProduct(@Res() response, @Body() CreateProductDto: CreateProductDto) {
         try {
+            const productSupplier = await this.supplierService.getSupplier(CreateProductDto.supplierId);
             const newProduct = await this.productService.createProduct(CreateProductDto);
+            productSupplier.products.push(newProduct._id);
+            productSupplier.productCount++;
+            await this.supplierService.updateSupplier(productSupplier._id, productSupplier);
             return response.status(HttpStatus.CREATED).json({
                 message: 'Product has been created successfully',
                 newProduct,
@@ -19,7 +24,7 @@ export class ProductController {
         } catch (err) {
             return response.status(HttpStatus.BAD_REQUEST).json({
                 statusCode: 400,
-                message: 'Error: Product not created!',
+                message: 'Error: Product not created! Check supplierId and other values.',
                 error: 'Bad Request'
             });
         }
@@ -67,10 +72,15 @@ export class ProductController {
     @Delete('/:id')
     async deleteProduct(@Res() response, @Param('id') productId: string) {
         try {
-            const deletedProduct = await this.productService.deleteProduct(productId);
+            const product = await this.productService.getProduct(productId);
+            const productSupplier = await this.supplierService.getSupplier(product.supplierId);
+            await this.productService.deleteProduct(productId);
+            productSupplier.products.splice(productSupplier.products.indexOf(productId), 1);
+            productSupplier.productCount--;
+            await this.supplierService.updateSupplier(productSupplier._id, productSupplier);
             return response.status(HttpStatus.OK).json({
                 message: 'Product deleted successfully',
-                deletedProduct,
+                product,
             });
         } catch (err) {
             return response.status(err.status).json(err.response);

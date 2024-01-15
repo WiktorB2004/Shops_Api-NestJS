@@ -5,9 +5,12 @@ import { SupplierService } from './suppliers.service';
 import { Supplier, SupplierSchema } from '../schemas/supplier.schema';
 import { DatabaseModule } from '../database.module';
 
+
+const SupplierModel = MongooseModule.forFeature([{ name: Supplier.name, schema: SupplierSchema }]);
 @Module({
-    imports: [MongooseModule.forFeature([{ name: Supplier.name, schema: SupplierSchema }]), forwardRef(() => DatabaseModule)],
+    imports: [SupplierModel, forwardRef(() => DatabaseModule)],
     controllers: [SupplierController],
     providers: [SupplierService],
+    exports: [SupplierService, SupplierModel]
 })
 export class SuppliersModule { }
