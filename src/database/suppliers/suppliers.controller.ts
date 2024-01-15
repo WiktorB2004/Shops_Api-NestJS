@@ -2,11 +2,12 @@ import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, Res } from
 import { CreateSupplierDto } from '../dto/create-supplier.dto';
 import { UpdateSupplierDto } from '../dto/update-supplier.dto';
 import { SupplierService } from './suppliers.service';
+import { ProductService } from '../products/products.service';
 
 
 @Controller('supplier')
 export class SupplierController {
-    constructor(private readonly supplierService: SupplierService) { }
+    constructor(private readonly supplierService: SupplierService, private readonly productService: ProductService) { }
 
     @Post()
     async createSupplier(@Res() response, @Body() CreateSupplierDto: CreateSupplierDto) {
@@ -68,6 +69,10 @@ export class SupplierController {
     async deleteSupplier(@Res() response, @Param('id') supplierId: string) {
         try {
             const deletedSupplier = await this.supplierService.deleteSupplier(supplierId);
+            for (let productId of deletedSupplier.products) {
+                await this.productService.deleteProduct(productId);
+            }
+
             return response.status(HttpStatus.OK).json({
                 message: 'Supplier deleted successfully',
                 deletedSupplier,
