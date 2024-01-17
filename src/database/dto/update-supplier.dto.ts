@@ -1,4 +1,9 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateSupplierDto } from './create-supplier.dto';
+import { IsEmail, IsEmpty, IsPhoneNumber, IsString, MaxLength } from "class-validator";
 
-export class UpdateSupplierDto extends PartialType(CreateSupplierDto) { }
+export class UpdateSupplierDto {
+    @IsEmpty()
+    products: string[];
+
+    @IsEmpty()
+    productCount: number;
+}
